@@ -4,6 +4,10 @@ import java.util.ArrayList;
 
 public class TreeTraversal {
 
+    private static int[] path;
+    private static ArrayList<String> dfsPaths;
+    private int numberOfNodes;
+    private static AdjArray graph;
 
     /**
      * This method traverses the tree using depth first search. To eliminate any ambiguity choosing the next node,
@@ -15,22 +19,61 @@ public class TreeTraversal {
      * @return array with predecessors. I.e. pi[5] = 2 means, that node 2 is predecessor of node 5.
      */
     public static int[] dfs(ArrayList<ArrayList<Integer>> weights, int s) throws IllegalArgumentException {
-        AdjArray adjArray = new AdjArray(weights);
-        int[] path = new int[adjArray.getNumberOfNodes()];
+        dfsPaths = new ArrayList<>();
+        graph = new AdjArray(weights);
 
-        for (int i = 0; i < path.length; path[i++] = -1) {
+        String p = "" + s;
+        visit(s, -1, graph, p);
+
+        String selectedPath = selectPath(dfsPaths);
+
+        return createReturnPath(selectedPath);
+    }
+
+    private static String selectPath(ArrayList<String> paths) {
+        String selected = "";
+        int maxLength = 0;
+        int lastNodeOfCurrentMaxLengthPath = -1;
+        for (String path: paths) {
+            if (path.length() > maxLength && Integer.parseInt(String.valueOf(path.charAt(path.length() - 1))) != lastNodeOfCurrentMaxLengthPath) {
+                selected = path;
+                maxLength = path.length();
+                lastNodeOfCurrentMaxLengthPath = Integer.parseInt(String.valueOf(path.charAt(path.length() - 1)));
+            }
         }
+        return selected;
+    }
 
-        int currentNodeId = s;
-        ArrayList<Integer> children;
-        while (adjArray.hasChildrenFor(currentNodeId)) {
-            children = adjArray.getChildNodesSorted(currentNodeId);
-            int nextNodeId = children.get(0);
-            path[nextNodeId] = currentNodeId;
-            currentNodeId = nextNodeId;
+    private static int [] createReturnPath(String pathString) {
+        int [] returnPath = new int[graph.getNumberOfNodes()];
+
+        for (int i = 0; i < returnPath.length; returnPath[i++] = -1) {
         }
+        ArrayList<Integer> pathList = new ArrayList<>();
+        for (char c: pathString.toCharArray()) {
+            int currentId = Integer.parseInt(String.valueOf(c));
+            pathList.add(currentId);
+        }
+        int parentId = -1;
+        int currentId = -1;
+        for (int i = pathList.size() - 1; i >= 0; i--) {
+            currentId = pathList.get(i);
+            if (parentId != -1) {
+                returnPath[parentId] = currentId;
+            }
+            parentId = currentId;
+        }
+        return returnPath;
+    }
 
-        return path;
+    private static void visit(int nodeId, int parentNodeId, AdjArray graph, String p) {
+        if (graph.hasChildrenFor(nodeId)) {
+            for (int childId: graph.getChildNodesSorted(nodeId)) {
+                visit(childId, parentNodeId, graph, p + childId);
+            }
+        } else {
+            dfsPaths.add(p);
+        }
     }
 
 }
