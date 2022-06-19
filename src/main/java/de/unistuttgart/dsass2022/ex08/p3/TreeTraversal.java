@@ -30,6 +30,16 @@ public class TreeTraversal {
         return createReturnPath(selectedPath);
     }
 
+    private static void visit(int nodeId, int parentNodeId, AdjArray graph, String p) {
+        if (graph.hasChildrenFor(nodeId)) {
+            for (int childId: graph.getChildNodesSorted(nodeId)) {
+                visit(childId, parentNodeId, graph, p + childId);
+            }
+        } else {
+            dfsPaths.add(p);
+        }
+    }
+
     private static String selectPath(ArrayList<String> paths) {
         String selected = "";
         int maxLength = 0;
@@ -64,16 +74,6 @@ public class TreeTraversal {
             parentId = currentId;
         }
         return returnPath;
-    }
-
-    private static void visit(int nodeId, int parentNodeId, AdjArray graph, String p) {
-        if (graph.hasChildrenFor(nodeId)) {
-            for (int childId: graph.getChildNodesSorted(nodeId)) {
-                visit(childId, parentNodeId, graph, p + childId);
-            }
-        } else {
-            dfsPaths.add(p);
-        }
     }
 
 }

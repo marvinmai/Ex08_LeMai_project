@@ -37,12 +37,12 @@ public class AdjArray {
         return adjArr;
     }
 
-    public int get(int src, int target) {
+    public int getWeight(int src, int target) {
         return this.adjArr.get(src).get(target);
     }
 
     public boolean hasChildrenFor(int nodeId) {
-        for (int weight: adjArr.get(nodeId)) {
+        for (int weight : adjArr.get(nodeId)) {
             if (weight != 0) {
                 return true;
             }
@@ -60,6 +60,33 @@ public class AdjArray {
         }
         Collections.sort(children);
         return children;
+    }
+
+    public ArrayList<Edge> getOutgoingEdgesForSource(int src) {
+        ArrayList<Integer> childNodes = getChildNodesSorted(src);
+        ArrayList<Edge> outgoingEdges = new ArrayList<>();
+        for (int childNodeId: childNodes) {
+            int weight = getWeight(src, childNodeId);
+            outgoingEdges.add(new Edge(src, childNodeId, weight));
+        }
+        return outgoingEdges;
+    }
+
+    public ArrayList<Edge> pathToEdgeList(int[] path) {
+        ArrayList<Edge> edges = new ArrayList<>();
+        for (int i = path.length - 1; i >= 0;) {
+            if (path[i] != -1) {
+                int target = i;
+                int src = path[i];
+                int weight = this.getWeight(src, target);
+                edges.add(new Edge(src, target, weight));
+                i = src;
+            } else {
+                i--;
+            }
+
+        }
+        return edges;
     }
 
     @Override
